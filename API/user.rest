@@ -8,8 +8,8 @@ POST http://localhost:4200/api/v1/user/signup
 Content-Type: application/json
 
 {
-    "userName": "Bob31",
-    "password": "12345678"
+    "userName": "Bobby31",
+    "password": "123456"
 }
 
 ###

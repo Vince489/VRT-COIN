@@ -32,8 +32,8 @@ router.post('/signup', async (req, res) => {
   }
 
   // Validate password length
-  if (!password || password.length < 6 || password.length > 1024) {
-    return res.status(400).json({ message: 'Password must be between 6 and 1024 characters.' });
+  if (!password || password.length < 6 || password.length > 128) {
+    return res.status(400).json({ message: 'Password must be between 6 and 128 characters.' });
   }
 
   // Check if userName already exists
