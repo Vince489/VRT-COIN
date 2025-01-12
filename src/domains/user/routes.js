@@ -22,11 +22,18 @@ router.get('/', async (req, res) => {
 
 // Signup
 router.post('/signup', async (req, res) => {
-  const { userName, password } = req.body;
+  let { userName, password } = req.body;
 
-  // Validate input
-  if (!userName || !password) {
-    return res.status(400).json({ message: 'userName and password are required' });
+  console.log('Received data:', { userName, password });  // Check the received data
+
+  // Validate userName length
+  if (!userName || userName.length < 3 || userName.length > 50) {
+    return res.status(400).json({ message: 'userName must be between 3 and 50 characters.' });
+  }
+
+  // Validate password length
+  if (!password || password.length < 6 || password.length > 1024) {
+    return res.status(400).json({ message: 'Password must be between 6 and 1024 characters.' });
   }
 
   // Check if userName already exists
@@ -43,9 +50,10 @@ router.post('/signup', async (req, res) => {
     const newUser = await user.save();
     res.redirect('/login');
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ message: `Error: ${err.message}` });
   }
 });
+
 
 // Login
 router.post('/login', async (req, res) => {
