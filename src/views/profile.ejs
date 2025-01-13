@@ -1,26 +1,21 @@
 <!-- Profile Header -->
-<div class="pt-16 px-4">
-    <div class="flex items-center justify-between mb-4">
-        <h1 class="text-xl font-semibold" id="name"><%= user.name %></h1>
-        <div class="flex items-center space-x-4">
-            <!-- <button class="p-2">👤</button>
-            <button class="p-2">☰</button> -->
-        </div>
-    </div>
-</div>
+<%- include('partials/profile-header', { user: user }) %>
 
 <!-- Profile Info -->
 <div class="flex flex-col items-center px-4">
-    <div class="relative">
-        <div id="profile-image" class="w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center text-4xl">
-            O
-        </div>
-        <button class="absolute bottom-0 right-0 bg-cyan-400 rounded-full px-1.5">
-            +
-        </button>
+  <!-- Avatar -->
+  <div class="relative">
+    <div
+      id="profile-image"
+      class="w-24 h-24 rounded-full flex items-center justify-center text-4xl text-white <%= avatarColor || 'bg-gray-500' %>"> <!-- Use Tailwind class for avatar color -->
+      <%= user.userName.charAt(0).toUpperCase() %> <!-- Display the first letter of the username -->
     </div>
+    <button class="absolute bottom-0 right-0 bg-cyan-400 rounded-full px-1.5">
+      +
+    </button>
+  </div>
 
-    <p class="mt-2 text-lg" id="userName">@<%= user.userName || 'No username available' %></p>
+  <p class="mt-2 text-lg" id="userName">@<%= user.userName %></p> <!-- Username display, no fallback for empty username -->
 </div>
 
 <!-- Stats -->

@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 const { isAuthenticated, redirectIfLoggedIn } = require("../middleware");
 const User = require("../domains/user/model");
+const { getAvatarColor } = require('../utils/avatar');
 
 // Serve Home Page
 router.get("/", (req, res) => {
@@ -26,6 +27,22 @@ router.get("/chat", isAuthenticated, (req, res) => {
 });
 
 // Serve profile Page (protected route)
+// router.get("/profile", isAuthenticated, async (req, res) => {
+//     try {
+//         const userId = req.session.userId;
+//         const user = await User.findById(userId);  // Assuming you have a User model
+
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+
+//         res.render("profile", { user, title: "Profile" });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).send("Internal Server Error");
+//     }
+// });
+
 router.get("/profile", isAuthenticated, async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -35,11 +52,19 @@ router.get("/profile", isAuthenticated, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.render("profile", { user, title: "Profile" });
+        // Get the avatar color based on the first letter of the username
+        const avatarColor = getAvatarColor(user.userName);
+
+        res.render("profile", { user, avatarColor, title: "Profile" });
     } catch (err) {
         console.error(err);
         res.status(500).send("Internal Server Error");
     }
+});
+
+// Serve Settings Page
+router.get("/settings", isAuthenticated, (req, res) => {
+    res.render("settings", { title: "Settings" });
 });
 
 // Serve Yu Page
