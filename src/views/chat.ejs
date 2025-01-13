@@ -1,0 +1,26 @@
+<!-- Chat Header -->
+<%- include('partials/chat-header', { title: title }) %>
+
+<!-- Messages Container -->
+<div id="messages" class="p-4 space-y-4 h-[calc(100vh-12rem)] overflow-y-auto pt-20">
+    <!-- Messages will be rendered here -->
+  </div>
+  
+  <!-- Message Input -->
+  <div class="fixed bottom-16 left-0 right-0 max-w-md mx-auto bg-[#2A2A2A] border-t border-gray-700 p-4">
+    <form id="messageForm" class="flex gap-2">
+      <input 
+        type="text" 
+        id="messageInput"
+        class="flex-1 rounded-full border border-gray-700 px-4 py-2 focus:outline-none focus:border-blue-500 bg-[#1E1E1E] text-gray-200"
+        placeholder="Type a message..."
+      >
+      <button 
+        type="submit"
+        class="bg-blue-600 text-white rounded-full px-6 py-2 hover:bg-blue-700 focus:outline-none"
+      >
+        Send
+      </button>
+    </form>
+  </div>
+  <script src="/js/main.js"></script>

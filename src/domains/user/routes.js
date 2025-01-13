@@ -1,5 +1,4 @@
 // src/domains/user/routes.js
-
 const express = require('express');
 const bcrypt = require('bcrypt'); // Import bcrypt
 const router = express.Router();
@@ -22,9 +21,10 @@ router.get('/', async (req, res) => {
 
 // Signup
 router.post('/signup', async (req, res) => {
+  if (req.session.userId) {
+    return res.redirect("/profile");  // Redirect logged-in users to profile
+  }
   let { userName, password } = req.body;
-
-  console.log('Received data:', { userName, password });  // Check the received data
 
   // Validate userName length
   if (!userName || userName.length < 3 || userName.length > 50) {
@@ -32,8 +32,8 @@ router.post('/signup', async (req, res) => {
   }
 
   // Validate password length
-  if (!password || password.length < 6 || password.length > 128) {
-    return res.status(400).json({ message: 'Password must be between 6 and 128 characters.' });
+  if (!password || password.length < 6 || password.length > 64) {
+    return res.status(400).json({ message: 'Password must be between 6 and 64 characters.' });
   }
 
   // Check if userName already exists
@@ -43,47 +43,54 @@ router.post('/signup', async (req, res) => {
   }
 
   try {
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User({ userName, password: hashedPassword });
 
-    const newUser = await user.save();
-    res.redirect('/login');
+    await user.save();
+    return res.status(200).json({ message: 'Signup successful!' });
   } catch (err) {
-    res.status(400).json({ message: `Error: ${err.message}` });
+    return res.status(500).json({ message: `Error: ${err.message}` });
   }
 });
 
-
 // Login
 router.post('/login', async (req, res) => {
+  if (req.session.userId) {
+    console.log('User is already logged in. Redirecting to profile...');
+    return res.redirect("/profile");  // Redirect logged-in users to profile
+  }
+
   const { userName, password } = req.body;
 
   // Validate input
-  if (!userName || !password) {
-    return res.status(400).json({ message: 'userName and password are required' });
+  if (!userName) {
+    return res.status(400).json({ message: 'Username is required' });
+  }
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required' });
   }
 
   try {
     // Find the user by username
     const user = await User.findOne({ userName });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid username or password' });
+      return res.status(400).json({ message: 'Username does not exist' });
     }
 
     // Compare the provided password with the stored hash
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid username or password' });
+      return res.status(400).json({ message: 'Incorrect password' });
     }
 
-    // If the password is correct, store user in session
+    // Store user information in the session
     req.session.userId = user._id;
     req.session.userName = user.userName;
 
-    // Redirect to the dashboard
-    res.redirect('/dashboard');
+    // Send a success response
+    res.status(200).json({ message: 'Login successful', redirect: '/profile' });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
@@ -98,62 +105,28 @@ router.get('/logout', (req, res) => {
   });
 });
 
-// Profile
-router.get('/profile', (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  res.render('profile', { userName: req.session.userName });
-});
-
-// Edit Profile
-router.post('/edit', async (req, res) => {
-  const { newUserName, newPassword } = req.body;
-
-  // Check if the user is authenticated
-  if (!req.session.userId) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
+// Profile route to get user data based on session
+router.get('/profile', async (req, res) => {
   try {
-    const updates = {};
+    const userId = req.session.userId;
 
-    // If new username is provided, validate and update it
-    if (newUserName) {
-      const existingUser = await User.findOne({ userName: newUserName });
-      if (existingUser) {
-        return res.status(400).json({ message: 'Username is already taken' });
-      }
-      updates.userName = newUserName;
+    if (!userId) {
+      return res.status(401).json({ message: 'You must be logged in to view the profile' });
     }
 
-    // If new password is provided, hash and update it
-    if (newPassword) {
-      const hashedPassword = await bcrypt.hash(newPassword, 12);
-      updates.password = hashedPassword;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update the user in the database
-    const updatedUser = await User.findByIdAndUpdate(req.session.userId, updates, { new: true });
-
-    if (newPassword) {
-      // If the password was changed, clear the session and redirect to login
-      req.session.destroy((err) => {
-        if (err) {
-          return res.status(500).json({ message: 'Error logging out after password change' });
-        }
-        res.redirect('/login'); // Redirect to login page
-      });
-    } else {
-      // If only username was changed, update session and redirect to dashboard
-      if (newUserName) {
-        req.session.userName = updatedUser.userName;
-      }
-      res.redirect('/dashboard'); // Redirect to dashboard
-    }
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    // Pass the user data and title to the EJS template
+    res.render('profile', { user, title: 'User Profile' });
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
+
 
 module.exports = router;

@@ -2,14 +2,8 @@
 
 const express = require("express");
 const router = express.Router();
-
-// Middleware to check if a user is authenticated
-function isAuthenticated(req, res, next) {
-    if (req.session.userId) {
-        return next();
-    }
-    res.redirect("/login");
-}
+const { isAuthenticated, redirectIfLoggedIn } = require("../middleware");
+const User = require("../domains/user/model");
 
 // Serve Home Page
 router.get("/", (req, res) => {
@@ -17,13 +11,35 @@ router.get("/", (req, res) => {
   });
   
 // Serve Signup Page
-router.get("/signup", (req, res) => {
+router.get("/signup", redirectIfLoggedIn, (req, res) => {
     res.render("signup", { title: "Sign Up" });
 });
 
 // Serve Login Page
-router.get("/login", (req, res) => {
+router.get("/login", redirectIfLoggedIn, (req, res) => {
     res.render("login", { title: "Log In" });
+});
+
+// Serve Chat Page
+router.get("/chat", isAuthenticated, (req, res) => {
+    res.render("chat", { title: "Chat" });
+});
+
+// Serve profile Page (protected route)
+router.get("/profile", isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const user = await User.findById(userId);  // Assuming you have a User model
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.render("profile", { user, title: "Profile" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 // Serve Yu Page
@@ -180,11 +196,6 @@ router.get("/yu", (req, res) => {
     ];
 
     res.render("yu", { title: "Yu", roadmapSections });
-});
-
-// Serve Dashboard Page (protected route)
-router.get("/dashboard", isAuthenticated, (req, res) => {
-    res.render("dashboard", { userName: req.session.userName || "User", title: "Dashboard" });
 });
 
 // Handle Logout

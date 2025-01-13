@@ -13,6 +13,7 @@
           name="userName" 
           id="userName" 
           required
+          autocomplete="username"
           class="w-full px-4 py-2 bg-gray-700 text-gray-100 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
         >
       </div>
@@ -23,6 +24,7 @@
           name="password" 
           id="password" 
           required
+          autocomplete="new-password"
           class="w-full px-4 py-2 bg-gray-700 text-gray-100 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400"
         >
       </div>
@@ -37,11 +39,12 @@
 </div>
 
 <script>
+  // Handle form submission and error display
   const form = document.getElementById('signup-form');
   const errorMessageDiv = document.getElementById('error-message');
 
   form.addEventListener('submit', async (e) => {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault();
 
     const formData = new FormData(form);
     const data = {};
@@ -53,20 +56,22 @@
       const response = await fetch(form.action, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const responseData = await response.json();
+        localStorage.setItem('notification', responseData.message); // Save the message in localStorage
+        window.location.href = '/login'; // Redirect to the login page
+      } else {
         const errorData = await response.json();
         errorMessageDiv.textContent = errorData.message || 'An error occurred. Please try again.';
-        errorMessageDiv.classList.remove('hidden'); // Show error message
-      } else {
-        window.location.href = '/login'; // Redirect on success
+        errorMessageDiv.classList.remove('hidden'); // Show the error message
       }
     } catch (error) {
-      errorMessageDiv.textContent = 'An unexpected error occurred. Please try again.';
+      errorMessageDiv.textContent = 'Something went wrong. Please try again.';
       errorMessageDiv.classList.remove('hidden');
     }
   });

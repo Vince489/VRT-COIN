@@ -8,7 +8,7 @@ POST http://localhost:4200/api/v1/user/signup
 Content-Type: application/json
 
 {
-    "userName": "Bobby31",
+    "userName": "Bobby12",
     "password": "123456"
 }
 

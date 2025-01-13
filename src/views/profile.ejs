@@ -1,0 +1,88 @@
+<!-- Profile Header -->
+<div class="pt-16 px-4">
+    <div class="flex items-center justify-between mb-4">
+        <h1 class="text-xl font-semibold" id="name"><%= user.name %></h1>
+        <div class="flex items-center space-x-4">
+            <!-- <button class="p-2">👤</button>
+            <button class="p-2">☰</button> -->
+        </div>
+    </div>
+</div>
+
+<!-- Profile Info -->
+<div class="flex flex-col items-center px-4">
+    <div class="relative">
+        <div id="profile-image" class="w-24 h-24 bg-purple-600 rounded-full flex items-center justify-center text-4xl">
+            O
+        </div>
+        <button class="absolute bottom-0 right-0 bg-cyan-400 rounded-full px-1.5">
+            +
+        </button>
+    </div>
+
+    <p class="mt-2 text-lg" id="userName">@<%= user.userName || 'No username available' %></p>
+</div>
+
+<!-- Stats -->
+<div class="flex justify-center space-x-12 mt-6">
+    <div class="text-center">
+        <div class="font-semibold" id="following"><%= user.following.length || '0' %></div>
+        <div class="text-gray-400 text-sm">Following</div>
+    </div>
+    <div class="text-center">
+        <div class="font-semibold" id="followers"><%= user.followers.length || '0' %></div>
+        <div class="text-gray-400 text-sm">Followers</div>
+    </div>
+    <div class="text-center">
+        <div class="font-semibold" id="likes"><%= user.likes.length || '0' %></div>
+        <div class="text-gray-400 text-sm">Likes</div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="flex justify-center space-x-2 mt-4 px-4">
+    <button class="flex-1 bg-gray-100 text-black py-2 rounded-md">
+        Edit profile
+    </button>
+    <button class="flex-1 bg-gray-100 text-black py-2 rounded-md">
+        Share profile
+    </button>
+    <button class="bg-gray-100 text-black p-2 rounded-md">
+        👤+
+    </button>
+</div>
+
+<!-- Add Bio -->
+<div class="flex justify-center mt-4">
+    <button class="text-gray-400">+ Add bio</button>
+</div>
+
+<!-- TikTok Studio -->
+<div class="flex justify-center mt-4">
+    <button class="flex items-center space-x-2">
+        <span>✂️</span>
+        <span>Virtron Studio</span>
+    </button>
+</div>
+
+<!-- Videos -->
+<div class="grid grid-cols-3 gap-4 mt-6">
+    <div class="relative">
+        <div class="w-full h-48 bg-gray-300 rounded-lg"></div>
+        <span class="absolute top-0 right-0 bg-white text-black px-2 py-1 rounded-lg text-sm">
+            0:15
+        </span>
+    </div>
+    <div class="relative">
+        <div class="w-full h-48 bg-gray-300 rounded-lg"></div>
+        <span class="absolute top-0 right-0 bg-white text-black px-2 py-1 rounded-lg text-sm">
+            0:15
+        </span>
+    </div>
+    <div class="relative">
+        <div class="w-full h-48 bg-gray-300 rounded-lg"></div>
+        <span class="absolute top-0 right-0 bg-white text-black px-2 py-1 rounded-lg text-sm">
+            0:15
+        </span>
+    </div>
+</div>
